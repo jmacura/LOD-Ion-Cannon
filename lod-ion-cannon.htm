@@ -1,0 +1,44 @@
+<!-- This Source Code Form is subject to the terms of the Mozilla Public
+   - License, v. 2.0. If a copy of the MPL was not distributed with this
+   - file, You can obtain one at http://mozilla.org/MPL/2.0/. -->
+<!doctype html>
+<html dir="ltr" lang="cs">
+<head>
+	<meta charset="UTF-8">
+	<meta name="author" content="jmacura 2016">
+	<meta name="robots" content="index, follow">
+	<meta http-equiv="content-type" content="text/html; charset=utf-8">
+	<title>LOD Ion Cannon</title>
+	<link rel="stylesheet" href="styles.css" type="text/css" media="all">
+	<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.2/jquery.min.js"></script>
+	<script src="FileSaver.min.js"></script>
+	<script src="LODIC.js" charset="utf-8"></script>
+</head>
+
+<body lang="cs">
+<main>
+
+<div id="content">
+	<h1>LOD Ion Cannon</h1>
+	<p>This primitive tool provides functionality to retrieve big data fractions from SPARQL endpoints, where the number of results is limited. This is achieved by sending the query "per partes".</p>
+	<button onclick="getCount();">Sum the results</button>&emsp;
+	<button onclick="retrieveData();">Query data from endpoint (fire teh cannon!)</button>&emsp;
+	<button onclick="saveData();">Save those data to CSV</button>
+	<!--<button onclick="connectToApi();">CORS API test</button><br>-->
+	<div id="info-block"><p>&nbsp;<p></div>
+	<p>&nbsp;</p>
+	<footer>
+		<div class="logo">
+			<img src="logo_web.svg" alt="author's logo">
+		</div>
+		<div class="credits">
+			This work is licensed under a <a rel="license" href="https://www.mozilla.org/en-US/MPL/2.0/">Mozilla Public License Version 2.0</a>.
+			<p>Author: Jan Macura, 2016</p>
+			<p>University of West Bohemia, <a href="http://www.fav.zcu.cz/en">Faculty of Applied Sciences</a></p>
+		</div>
+	</footer>
+</div>
+
+</main>
+</body>
+</html>
