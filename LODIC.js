@@ -57,7 +57,7 @@ function retrieveData() {
 }
 
 function saveData() {
-	saveAs(dataBlob, "all-dbp-lat+long.csv");
+	saveAs(dataBlob, "all-dbp-points.csv");
 }
 
 // *** Converter from JSON query result 2 CSV ****
@@ -98,46 +98,21 @@ function queryBuilder(type, iteration) {
 				"?place dbp:latD ?lat .\n" +
 				"?place dbp:longD ?lon .\n" +
 			"}";
-	if (type == "mayor") {
-	var url = "http://lod.openlinksw.com/sparql";
-	var query =
-		"PREFIX : <http://www.wikidata.org/entity/>\n" +
-		"PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>\n" +
-		"SELECT DISTINCT ?lat ?lon ?citylabel ?mayorlabel WHERE {\n" +
-		"?city :P31c/:P279c* :Q515 .\n" +
-		"?city :P6s ?statement .\n" +
-		"?statement :P6v ?mayor .\n" +
-		"?mayor :P21c :Q6581072 .\n" +
-		"FILTER NOT EXISTS { ?statement :P582q ?x }\n" +
-		"?city :P1082s/:P1082v/<http://www.wikidata.org/ontology#numericValue> ?population .\n" +
-		"OPTIONAL {\n" +
-			"?city rdfs:label ?citylabel .\n" +
-			"FILTER ( LANG(?citylabel) = \"cs\" )\n" +
-		"}\n" +
-		"OPTIONAL {\n" +
-			"?city :P625c/<http://www.wikidata.org/ontology#latitude> ?lat .\n" +
-			"?city :P625c/<http://www.wikidata.org/ontology#longitude> ?lon .\n" +
-		"}\n" +
-		"OPTIONAL {\n" +
-			"?mayor rdfs:label ?mayorlabel .\n" +
-			"FILTER ( LANG(?mayorlabel) = \"en\" )\n" +
-		"}} ORDER BY DESC(?population) LIMIT 100";
-	console.log(query);
-	}
-	else if (type == "latlon_c") {
+	if (type == "latlong_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"select count(distinct ?place) where {\n" +
-			latlong_base2 +
+			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
+			latlong_base +
 			"}";
 		console.log(query);
 	}
 	else if (type == "latlong") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"select distinct ?place ?lat ?lon where {\n" +
+			"SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n" +
 			latlong_base +
-			"} LIMIT 10000";
+			"} GROUP BY ?place\n" +
+			"LIMIT 10000";
 			if (iteration && iteration > 0) {
 				query += "OFFSET " + (iteration*10000);
 			}
@@ -146,9 +121,10 @@ function queryBuilder(type, iteration) {
 	else if (type == "latdlongd") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"select distinct ?place ?lat ?lon where {\n" +
+			"SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n" +
 			latlong_base2 +
-			"} LIMIT 10000";
+			"} GROUP BY ?place\n" +
+			"LIMIT 10000";
 			if (iteration && iteration > 0) {
 				query += "OFFSET " + (iteration*10000);
 			}
@@ -157,7 +133,7 @@ function queryBuilder(type, iteration) {
 	else if (type == "geometry_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT count(distinct ?place) where {\n" +
+			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
 			"?place geo:geometry ?wkt .\n" +
 			"}";
 		console.log(query);
@@ -165,9 +141,10 @@ function queryBuilder(type, iteration) {
 	else if (type == "geometry") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT distinct ?place ?wkt where {\n" +
+			"SELECT DISTINCT ?place SAMPLE(?wkt) AS ?wkt WHERE {\n" +
 			"?place geo:geometry ?wkt.\n" +
-			"} LIMIT 10000";
+			"} GROUP BY ?place\n" +
+			"LIMIT 10000";
 			if (iteration && iteration > 0) {
 				query += " OFFSET " + (iteration*10000);
 			}
@@ -176,7 +153,7 @@ function queryBuilder(type, iteration) {
 	else if (type == "georss_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT count(distinct ?place) where {\n" +
+			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
 			"?place georss:point ?point.\n" +
 			"}";
 		console.log(query);
@@ -184,9 +161,10 @@ function queryBuilder(type, iteration) {
 	else if (type == "georss") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT distinct ?place ?point where {\n" +
+			"SELECT DISTINCT ?place SAMPLE(?point) AS ?point WHERE {\n" +
 			"?place georss:point ?point.\n" +
-			"} LIMIT 10000";
+			"} GROUP BY ?place\n" +
+			"LIMIT 10000";
 			if (iteration && iteration > 0) {
 				query += " OFFSET " + (iteration*10000);
 			}
@@ -195,7 +173,7 @@ function queryBuilder(type, iteration) {
 	else if (type == "degrees_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT count(distinct ?place) where {\n" +
+			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
 			"?place dbp:latDegrees ?lat.\n" +
 			"?place dbp:longDegrees ?lon.\n" +
 			"}";
@@ -204,10 +182,11 @@ function queryBuilder(type, iteration) {
 	else if (type == "degrees") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT distinct ?place ?lat ?lon where {\n" +
+			"SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n" +
 			"?place dbp:latDegrees ?lat.\n" +
 			"?place dbp:longDegrees ?lon.\n" +
-			"} LIMIT 10000";
+			"} GROUP BY ?place\n" +
+			"LIMIT 10000";
 				if (iteration && iteration > 0) {
 				query += " OFFSET " + (iteration*10000);
 			}
@@ -218,7 +197,7 @@ function queryBuilder(type, iteration) {
 		var query =
 			"PREFIX : <http://www.wikidata.org/entity/>\n" +
 			"PREFIX wdo: <http://www.wikidata.org/ontology#>\n" +
-			"SELECT distinct ?place ?lat ?lon WHERE {\n" +
+			"SELECT DISTINCT ?place ?lat ?lon WHERE {\n" +
 			"?place :P625c ?coords .\n" +
 			"?coords wdo:latitude ?lat .\n" +
 			"?coords wdo:longitude ?lon .\n" +
@@ -233,15 +212,3 @@ function queryBuilder(type, iteration) {
 	var queryUrl = url+"?query="+encodeURIComponent(query)+"&format=json&callback=?";
 	return queryUrl;
 }
-
-/*
- UNION\n" +
-			"{\n" +
-				"?place dbp:latd ?lat .\n" +
-				"?place dbp:longd ?lon .\n" +
-			"} UNION\n" +
-			"{\n" +
-				"?place dbp:latD ?lat .\n" +
-				"?place dbp:longD ?lon .\n" +
-			"}\n"
-*/
