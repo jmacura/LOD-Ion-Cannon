@@ -4,7 +4,6 @@ a {color: rgb(0, 161, 199); text-decoration: none;}
 a:visited {color: rgb(0, 163, 61); text-decoration: none;}
 a:hover {text-decoration: underline;}
 a:active {color: rgb(255, 102, 0); text-decoration: underline;}
-aside {margin-left: 900px; min-width: 150pt;}
 body {font-family: "Open Sans", sans-serif; margin: 0}
 footer {margin: 20pt 0 0 0; position: relative; font-size: small;}
 h1 {color: #777777; margin-bottom: 10pt;}
@@ -17,9 +16,22 @@ p {margin: 5pt 0 5pt 0;}
 .logo img {width: 75pt;}
 .right {text-align: right;}
 
-#content {margin: 10pt 10pt 0 10pt; max-width: 100%; padding: 10pt; border: solid 2px #666666; color: #555555;}
-#info-block table {background: #eeeeee;}
-#info-block td {padding-right: 10pt;}
+#content {
+	margin: 10pt 10pt 0 10pt;
+	max-width: 100%;
+	padding: 10pt;
+	border: solid 0.1rem #666666;
+	color: #555555;
+}
+#info-block {margin-top: 1rem;}
+#info-block p {
+	padding: 0.2rem;
+	background-color: #eeeeee;
+	border-style: solid;
+	border-width: 0 0 0 0.5rem;
+	border-color: #777777;
+	transition: border-color 0.5s ease-in;
+}
 
 #button-sum {visibility: visible;}
 #button-query {visibility: hidden;}

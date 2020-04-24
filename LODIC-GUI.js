@@ -17,14 +17,51 @@ function showNextButton() {
 }
 
 /**
-	* Updates information block element.
+	* Adds an info text to the log.
 	*
-	* @param {String} info Information which should be displayed to the user
+	* @param {String} infoMsg Information which should be displayed to the user
 	*/
-function showInfo(info) {
-	var infoBlock = $('#info-block');
-		while(infoBlock.hasChildNodes()) { //remove existing information
-		infoBlock.removeChild(infoBlock.firstChild);
+function showInfo(infoMsg) {
+	showMessage(infoMsg, 'info');
+}
+
+/**
+	* Adds a warning text to the log.
+	*
+	* @param {String} warnMsg Warning which should be displayed to the user
+	*/
+function showWarning(warnMsg) {
+	showMessage(warnMsg, 'warn');
+}
+
+/**
+ * Adds an error text to the log.
+ *
+ * @param {String} errorMsg Error message which should be displayed to the user
+ */
+function showError(errorMsg) {
+	showMessage(errorMsg, 'error');
+}
+
+/**
+ * Private function to be used by specific logging functions.
+ * Updates information block element.
+ *
+ * @private
+ * @param {String} message Message which should be appended to the log
+ * @param {String} type One of 'error', 'warn', 'info'
+ */
+function showMessage(message, type) {
+	var color;
+	switch (type) {
+		case 'info': color = '#11dd11'; break;
+		case 'warn': color = '#eeee99'; break;
+		case 'error': color = '#ee1111'; break;
+		default: break;
 	}
-	infoBlock.appendChild(info); //add new information
+	var $msg = $(`<p>&nbsp;${message}</p>`).css('border-color', color);
+	var infoBlock = $('#info-block');
+	//infoBlock.empty(); //remove existing information
+	infoBlock.find('p').css('border-color', '#777777');
+	infoBlock.prepend($msg); //add new information
 }

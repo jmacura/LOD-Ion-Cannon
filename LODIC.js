@@ -2,31 +2,33 @@
 /** This Source Code Form is subject to the terms of the Mozilla Public
 	* License, v. 2.0. If a copy of the MPL was not distributed with this
 	* file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	* @author: jmacura 2016 */
+	* @author jmacura 2016 */
 
 // global variables
-var count = 2156000;
+var count = 0;
 var dataBlob = null;
+var limit = 10000;
 
 // **** This is just count the number of results ****
 function getCount() {
 	var queryUrl = queryBuilder("degrees_c");
+	showInfo("Retrieving count of results");
 	$.ajax({
 		dataType: "json",
 		url: queryUrl,
 		success: function(data) {
 			count = data.results.bindings[0]["callret-0"].value;
+			showInfo(`There are ${count} results for your query.`);
 			showNextButton();
 			console.log(count);
 		}
 	});
-	//console.log("end"); nonsens - ajax is async
 }
 
 // **** This is just data retrieval fction ****
 function retrieveData() {
 	var iter = 1;
-	var resultsNumber = Math.ceil(count/10000);
+	var resultsNumber = Math.ceil(count/limit);
 	for(var i = 1; i <= resultsNumber; i++) {
 	//console.log(i);
 	$.ajax({
@@ -48,13 +50,12 @@ function retrieveData() {
 				str += "\r\n";
 				dataBlob = new Blob([str, results], {type: "text/csv;charset=utf-8"});
 			}
-			else console.log("Yo browsa no suporr blub");
+			else showWarning("Yo browsa no suporr blub");
 			//console.log(i, iter);
 			iter++;
 		}
 	});
 	}
-	//console.log("done"); --async => is not relevant
 }
 
 function saveData() {
@@ -99,7 +100,7 @@ function queryBuilder(type, iteration) {
 				"?place dbp:latD ?lat .\n" +
 				"?place dbp:longD ?lon .\n" +
 			"}";
-	if (type == "latlong_c") {
+	if (type === "latlong_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
@@ -107,19 +108,19 @@ function queryBuilder(type, iteration) {
 			"}";
 		console.log(query);
 	}
-	else if (type == "latlong") {
+	else if (type === "latlong") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
-			"SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n" +
-			latlong_base +
-			"} GROUP BY ?place\n" +
-			"LIMIT 10000";
-			if (iteration && iteration > 0) {
-				query += "OFFSET " + (iteration*10000);
-			}
+			`SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n
+			${latlong_base}
+			} GROUP BY ?place\n
+			LIMIT ${limit}`;
+		if (iteration && iteration > 0) {
+			query += "OFFSET " + (iteration*limit);
+		}
 		console.log(query);
 	}
-	else if (type == "latdlongd") {
+	else if (type === "latdlongd") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n" +
@@ -127,11 +128,11 @@ function queryBuilder(type, iteration) {
 			"} GROUP BY ?place\n" +
 			"LIMIT 10000";
 			if (iteration && iteration > 0) {
-				query += "OFFSET " + (iteration*10000);
+				query += "OFFSET " + (iteration*limit);
 			}
 		console.log(query);
 	}
-	else if (type == "geometry_c") {
+	else if (type === "geometry_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
@@ -139,7 +140,7 @@ function queryBuilder(type, iteration) {
 			"}";
 		console.log(query);
 	}
-	else if (type == "geometry") {
+	else if (type === "geometry") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT DISTINCT ?place SAMPLE(?wkt) AS ?wkt WHERE {\n" +
@@ -147,11 +148,11 @@ function queryBuilder(type, iteration) {
 			"} GROUP BY ?place\n" +
 			"LIMIT 10000";
 			if (iteration && iteration > 0) {
-				query += " OFFSET " + (iteration*10000);
+				query += " OFFSET " + (iteration*limit);
 			}
 		console.log(query);
 	}
-	else if (type == "georss_c") {
+	else if (type === "georss_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
@@ -159,7 +160,7 @@ function queryBuilder(type, iteration) {
 			"}";
 		console.log(query);
 	}
-	else if (type == "georss") {
+	else if (type === "georss") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT DISTINCT ?place SAMPLE(?point) AS ?point WHERE {\n" +
@@ -167,11 +168,11 @@ function queryBuilder(type, iteration) {
 			"} GROUP BY ?place\n" +
 			"LIMIT 10000";
 			if (iteration && iteration > 0) {
-				query += " OFFSET " + (iteration*10000);
+				query += " OFFSET " + (iteration*limit);
 			}
 		console.log(query);
 	}
-	else if (type == "degrees_c") {
+	else if (type === "degrees_c") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT COUNT(DISTINCT ?place) WHERE {\n" +
@@ -180,7 +181,7 @@ function queryBuilder(type, iteration) {
 			"}";
 		console.log(query);
 	}
-	else if (type == "degrees") {
+	else if (type === "degrees") {
 		var url = "http://dbpedia.org/sparql";
 		var query =
 			"SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {\n" +
@@ -189,11 +190,11 @@ function queryBuilder(type, iteration) {
 			"} GROUP BY ?place\n" +
 			"LIMIT 10000";
 				if (iteration && iteration > 0) {
-				query += " OFFSET " + (iteration*10000);
+				query += " OFFSET " + (iteration*limit);
 			}
 		console.log(query);
 	}
-	else if (type == "wd") {
+	else if (type === "wd") {
 		var url = "http://lod.openlinksw.com/sparql";
 		var query =
 			"PREFIX : <http://www.wikidata.org/entity/>\n" +
@@ -205,11 +206,11 @@ function queryBuilder(type, iteration) {
 			"?coords wdo:globe :Q2 .\n" +
 			"} LIMIT 10000";
 			if (iteration && iteration > 0) {
-				query += " OFFSET " + (iteration*10000);
+				query += " OFFSET " + (iteration*limit);
 			}
 		console.log(query);
 	}
-	else console.log("query type unknown");
+	else showWarning("Query type unknown");
 	var queryUrl = url+"?query="+encodeURIComponent(query)+"&format=json&callback=?";
 	return queryUrl;
 }
