@@ -52,10 +52,16 @@ function retrieveData() {
 			}
 			else showWarning("Yo browsa no suporr blub");
 			//console.log(i, iter);
-			iter++;
+			if (iter < resultsNumber) {
+				iter++;
+			} else {
+				showInfo(`${iter} queries sucessfully finished.`);
+				showNextButton();
+			}
 		}
 	});
 	}
+	showInfo(`${resultsNumber} queries sucessfully fired.`);
 }
 
 function saveData() {
