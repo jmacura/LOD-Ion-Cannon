@@ -16,6 +16,7 @@ function getCount() {
 		url: queryUrl,
 		success: function(data) {
 			count = data.results.bindings[0]["callret-0"].value;
+			showNextButton();
 			console.log(count);
 		}
 	});

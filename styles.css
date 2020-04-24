@@ -20,4 +20,7 @@ p {margin: 5pt 0 5pt 0;}
 #content {margin: 10pt 10pt 0 10pt; max-width: 100%; padding: 10pt; border: solid 2px #666666; color: #555555;}
 #info-block table {background: #eeeeee;}
 #info-block td {padding-right: 10pt;}
-#map {float: left; margin: 0; height: 620px; width: 900px; background: #ffffff;}
+
+#button-sum {visibility: visible;}
+#button-query {visibility: hidden;}
+#button-save {visibility: hidden;}

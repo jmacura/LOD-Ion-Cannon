@@ -13,6 +13,7 @@
 	<script src="https://code.jquery.com/jquery-3.5.0.min.js"></script>
 	<script src="https://code.jquery.com/jquery-migrate-3.2.0.min.js"></script>
 	<script src="FileSaver.min.js"></script>
+	<script src="LODIC-GUI.js" charset="utf-8"></script>
 	<script src="LODIC.js" charset="utf-8"></script>
 </head>
 
@@ -22,9 +23,9 @@
 <div id="content">
 	<h1>LOD Ion Cannon</h1>
 	<p>This primitive tool provides functionality to retrieve big data fractions from SPARQL endpoints, where the number of results is limited. This is achieved by sending the query "per partes".</p>
-	<button onclick="getCount();">Sum the results</button>&emsp;
-	<button onclick="retrieveData();">Query data from endpoint (fire teh cannon!)</button>&emsp;
-	<button onclick="saveData();">Save those data to CSV</button>
+	<button onclick="getCount();" id="button-sum">Sum the results</button>&emsp;
+	<button onclick="retrieveData();" id="button-query">Query data from endpoint (fire teh cannon!)</button>&emsp;
+	<button onclick="saveData();" id="button-save">Save those data to CSV</button>
 	<div id="info-block"><p>&nbsp;<p></div>
 	<p>&nbsp;</p>
 	<footer>
