@@ -24,18 +24,44 @@
 <div id="content">
 	<h1>LOD Ion Cannon</h1>
 	<p>This primitive tool provides functionality to retrieve big data fractions from SPARQL endpoints, where the number of results is limited. This is achieved by sending the query "per partes".</p>
+
+	<form>
+		<input type="reset" value="Reset to defaults"><br>
+		<label for="url">URL of your SPARQL endpoint: </label>
+		<input type="url" id="url" autofocus autocomplete="on" value="http://dbpedia.org/sparql" size=50><br>
+		<label for="count">Counting SPARQL query:</label><br>
+		<textarea id="count" rows=10 cols=70>
+SELECT COUNT(DISTINCT ?place) WHERE {
+?place dbp:latDegrees ?lat.
+?place dbp:longDegrees ?lon.
+}
+</textarea><br>
+		<label for="query">SPARQL query you would like to perform:</label><br>
+		<textarea id="query" rows=10 cols=70>
+SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon
+WHERE {
+?place dbp:latDegrees ?lat.
+?place dbp:longDegrees ?lon.
+} GROUP BY ?place
+</textarea><br>
+		<label for="limit">LIMIT:</label>
+		<input type="number" id="limit" min="1" value="10000" title="Maximum number of results that can be retrieved in a single query">
+	</form>
+
 	<button onclick="getCount();" id="button-sum">Sum the results</button>&emsp;
 	<button onclick="retrieveData();" id="button-query">Query data from endpoint (fire teh cannon!)</button>&emsp;
+	<input type="text" id="filename" value="all-dbp-points.csv" autocomplete="on">
 	<button onclick="saveData();" id="button-save">Save those data to CSV</button>
 	<div id="info-block"></div>
 	<p>&nbsp;</p>
+
 	<footer>
 		<div class="logo">
 			<img src="logo_web.svg" alt="author's logo">
 		</div>
 		<div class="credits">
 			This work is licensed under a <a rel="license" href="https://www.mozilla.org/en-US/MPL/2.0/">Mozilla Public License Version 2.0</a>.
-			<p>Author: Jan Macura, 2016</p>
+			<p>Author: Jan Macura, 2016, 2020</p>
 			<p>University of West Bohemia, <a href="http://www.fav.zcu.cz/en">Faculty of Applied Sciences</a></p>
 		</div>
 	</footer>

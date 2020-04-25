@@ -2,73 +2,100 @@
 /** This Source Code Form is subject to the terms of the Mozilla Public
 	* License, v. 2.0. If a copy of the MPL was not distributed with this
 	* file, You can obtain one at http://mozilla.org/MPL/2.0/.
-	* @author jmacura 2016 */
+	* @author jmacura 2016, 2020 */
 
 // global variables
 var count = 0;
 var dataBlob = null;
 var limit = 10000;
+var endpointUrl = '';
 
-// **** This is just count the number of results ****
+/**
+ * 1st action
+ * This just counts the number of results
+ */
 function getCount() {
-	var queryUrl = queryBuilder("degrees_c");
+	endpointUrl = $('#url').val();
+	var query = $('#count').val();
+	limit = $('#limit').val();
+	showInfo(`Using ${endpointUrl} as a target endpoint`);
+	//showInfo(`Sending ${query.slice(0,10)}... query`);
+	//showInfo(`Limit is set to ${limit}`);
+	//var oldQueryUrl = queryBuilder("degrees_c");
+	var queryUrl = queryBuilder(endpointUrl, query, limit, -1);
+	//console.log(queryUrl);
 	showInfo("Retrieving count of results");
 	$.ajax({
 		dataType: "json",
 		url: queryUrl,
-		success: function(data) {
-			count = data.results.bindings[0]["callret-0"].value;
-			showInfo(`There are ${count} results for your query.`);
-			showNextButton();
-			console.log(count);
-		}
+	}).done(function (data) {
+		count = data.results.bindings[0]["callret-0"].value;
+		showInfo(`There are ${count} results for your query, which will be split into ${Math.ceil(count / limit)} partial queries`);
+		showNextButton();
+		console.log(count);
+	}).fail(function (jqXHR, status, err) {
+		showError(`${status}: ${err}`);
 	});
 }
 
 // **** This is just data retrieval fction ****
 function retrieveData() {
-	var iter = 1;
+	if (!window.Blob) {
+		showError("Yo browsa no suporr blub!");
+		return;
+	}
+	var query = $('#query').val();
+	var iteration = 1;
+	var successfull = 0;
 	var resultsNumber = Math.ceil(count/limit);
-	for(var i = 1; i <= resultsNumber; i++) {
-	//console.log(i);
-	$.ajax({
-		dataType: "json",
-		url: queryBuilder("degrees", i-1),
-		success: function(_data) {
+	showInfo(`Sending ${query.slice(0, 30)}... query per partes`);
+	while(iteration <= resultsNumber) {
+		console.log(iteration);
+		$.ajax({
+			dataType: "json",
+			url: queryBuilder(endpointUrl, query, limit, iteration-1)
+		}).done(function (_data) {
+			successfull++;
 			//console.log(_data);
 			var results = convertToCSV(_data.results.bindings);
 			if (dataBlob != null) {
-				dataBlob = new Blob([dataBlob, new Blob([results])], {type: "text/csv;charset=utf-8"});
+				dataBlob = new Blob([dataBlob, new Blob([results])], { type: "text/csv;charset=utf-8" });
 			}
-			else if (window.Blob) {
+			else {
 				var vars = _data.head.vars;
 				var str = '';
-				for (var i in  vars) {
+				for (var i in vars) {
 					if (str != '') str += ',';
 					str += vars[i];
 				}
 				str += "\r\n";
-				dataBlob = new Blob([str, results], {type: "text/csv;charset=utf-8"});
+				dataBlob = new Blob([str, results], { type: "text/csv;charset=utf-8" });
 			}
-			else showWarning("Yo browsa no suporr blub");
-			//console.log(i, iter);
-			if (iter < resultsNumber) {
-				iter++;
-			} else {
-				showInfo(`${iter} queries sucessfully finished.`);
+			//console.log(iteration, successfull);
+			if (successfull >= resultsNumber) {
+				showInfo(`${successfull} queries successfully finished.`);
 				showNextButton();
 			}
-		}
-	});
+		}).fail(function (jqXHR, status, err) {
+			showError(`${status}: ${err}`);
+		});
+		iteration++;
 	}
-	showInfo(`${resultsNumber} queries sucessfully fired.`);
+	showInfo(`${resultsNumber} queries successfully fired.`);
 }
 
 function saveData() {
-	saveAs(dataBlob, "all-dbp-points.csv");
+	var fname = $('#filename').val();
+	saveAs(dataBlob, fname);
 }
 
-// *** Converter from JSON query result 2 CSV ****
+/**
+ * Converter from JSON query result 2 CSV
+ *
+ * @private
+ * @param {*} objArray
+ * @returns {String}
+ */
 function convertToCSV(objArray) {
 	var array = typeof objArray != 'object' ? JSON.parse(objArray) : objArray;
 	//console.log(array);
@@ -82,7 +109,7 @@ function convertToCSV(objArray) {
 				if (array[i][index].type = "literal") {
 					line += '"' + array[i][index].value + '"';
 				}
-				else {line += array[i][index].value};
+				else { line += array[i][index].value };
 			//console.log(item);
 		}
 		str += line + '\r\n';
@@ -90,8 +117,16 @@ function convertToCSV(objArray) {
 	return str;
 }
 
+function queryBuilder(url, queryBase, limit, iteration) {
+	var q = queryBase;
+	if (iteration && iteration > 0) {
+		q += `LIMIT ${limit} OFFSET ${iteration * limit}`;
+	}
+	return url + "?query=" + encodeURIComponent(q) + "&format=json&callback=?";
+}
+
 // this might be separated into standalone file in the future
-function queryBuilder(type, iteration) {
+/*function queryBuilder(type, iteration) {
 	var latlong_base =
 			"{\n" +
 				"?place geo:lat ?lat .\n" +
@@ -219,4 +254,4 @@ function queryBuilder(type, iteration) {
 	else showWarning("Query type unknown");
 	var queryUrl = url+"?query="+encodeURIComponent(query)+"&format=json&callback=?";
 	return queryUrl;
-}
+}*/

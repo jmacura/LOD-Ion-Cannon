@@ -12,6 +12,7 @@ function showNextButton() {
 	if ($('#button-query').css('visibility') === 'hidden') {
 		$('#button-query').css('visibility', 'visible')
 	} else if ($('#button-save').css('visibility') === 'hidden') {
+		$('#filename').css('visibility', 'visible')
 		$('#button-save').css('visibility', 'visible')
 	}
 }

@@ -9,6 +9,9 @@ footer {margin: 20pt 0 0 0; position: relative; font-size: small;}
 h1 {color: #777777; margin-bottom: 10pt;}
 main {position: absolute; width: 100%; margin: 0; padding: 0;}
 p {margin: 5pt 0 5pt 0;}
+form {margin: 1rem 0 1rem 0;}
+form > * {margin-left: 0.5rem;}
+button {font-size: large;}
 
 .credits {padding-top: 20pt; padding-right: 75pt;}
 .left {float: left;}
@@ -35,4 +38,5 @@ p {margin: 5pt 0 5pt 0;}
 
 #button-sum {visibility: visible;}
 #button-query {visibility: hidden;}
+#filename {visibility: hidden;}
 #button-save {visibility: hidden;}
