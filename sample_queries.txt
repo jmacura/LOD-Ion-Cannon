@@ -1,0 +1,93 @@
+# Lat & Long
+# Counting
+SELECT COUNT(DISTINCT ?place) WHERE {
+{
+	?place geo:lat ?lat .
+	?place geo:long ?lon .
+}
+}
+# Query
+SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {
+{
+	?place geo:lat ?lat .
+	?place geo:long ?lon .
+} GROUP BY ?place
+
+
+# LatD & LongD
+# Counting
+SELECT COUNT(DISTINCT ?place) WHERE {
+	{
+		?place dbp:latd ?lat .
+		?place dbp:longd ?lon .
+	} UNION
+	{
+		?place dbp:latD ?lat .
+		?place dbp:longD ?lon .
+	}
+}
+# Query
+SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {
+	{
+		?place dbp:latd ?lat .
+		?place dbp:longd ?lon .
+	} UNION
+	{
+		?place dbp:latD ?lat .
+		?place dbp:longD ?lon .
+	}
+} GROUP BY ?place
+
+# Geometry
+# Counting
+SELECT COUNT(DISTINCT ?place) WHERE {
+	?place geo:geometry ?wkt .
+}
+# Query
+SELECT DISTINCT ?place SAMPLE(?wkt) AS ?wkt WHERE {
+	?place geo:geometry ?wkt.
+} GROUP BY ?place
+
+# GeoRSS
+# Counting
+SELECT COUNT(DISTINCT ?place) WHERE {
+	?place georss:point ?point.
+}
+# Query
+SELECT DISTINCT ?place SAMPLE(?point) AS ?point WHERE {
+	?place georss:point ?point.
+} GROUP BY ?place
+
+# Degrees
+# Counting
+SELECT COUNT(DISTINCT ?place) WHERE {
+	?place dbp:latDegrees ?lat.
+	?place dbp:longDegrees ?lon.
+}
+# Query
+SELECT DISTINCT ?place SAMPLE(?lat) AS ?lat SAMPLE(?lon) AS ?lon WHERE {
+	?place dbp:latDegrees ?lat.
+	?place dbp:longDegrees ?lon.
+	} GROUP BY ?place
+
+# WD
+# Query
+PREFIX : <http://www.wikidata.org/entity/>
+PREFIX wdo: <http://www.wikidata.org/ontology#>
+SELECT DISTINCT ?place ?lat ?lon WHERE {
+	?place :P625c ?coords .
+	?coords wdo:latitude ?lat .
+	?coords wdo:longitude ?lon .
+	?coords wdo:globe :Q2 .
+}
+
+# Get hotels in Uganda (@foodie-cloud.org)
+PREFIX poi: <http: //www.openvoc.eu/poi#>
+PREFIX spoi: <http: //gis.zcu.cz/SPOI/Ontology#>
+SELECT DISTINCT ?poi ?geo
+FROM <http: //www.sdi4apps.eu/poi.rdf>
+WHERE {
+	?poi rdf:type spoi:hotel .
+	?poi ogcgs:sfWithin dbpedia:Uganda .
+	?poi ogcgs:asWKT ?geo .
+}
