@@ -81,13 +81,16 @@ SELECT DISTINCT ?place ?lat ?lon WHERE {
 	?coords wdo:globe :Q2 .
 }
 
-# Get hotels in Uganda (@foodie-cloud.org)
-PREFIX poi: <http: //www.openvoc.eu/poi#>
-PREFIX spoi: <http: //gis.zcu.cz/SPOI/Ontology#>
-SELECT DISTINCT ?poi ?geo
-FROM <http: //www.sdi4apps.eu/poi.rdf>
+# All SPOIs (https://www.foodie-cloud.org/sparql)
+# Count
+SELECT COUNT(DISTINCT ?poi)
+FROM <http://www.sdi4apps.eu/poi.rdf>
 WHERE {
-	?poi rdf:type spoi:hotel .
-	?poi ogcgs:sfWithin dbpedia:Uganda .
-	?poi ogcgs:asWKT ?geo .
+	?poi ogcgs:asWKT ?wkt .
 }
+# Query
+SELECT DISTINCT ?poi SAMPLE(?wkt) AS ?geo
+FROM <http://www.sdi4apps.eu/poi.rdf>
+WHERE {
+	?poi ogcgs:asWKT ?wkt .
+} GROUP BY ?poi
